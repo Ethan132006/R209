@@ -1,0 +1,14 @@
+{% extends "myfirstapp/main.html" %}
+
+{% block title %}
+    Mon formulaire
+{% endblock %}
+
+{% block content %}
+    <form action="/myfirstapp/bonjour" method="get">
+        {% csrf_token %}
+        <label for="nom"> Nom :</label>
+        <input type="text" name="nom"/>
+        <input type="submit" value="Envoyer"/>
+    </form>
+{% endblock %}
