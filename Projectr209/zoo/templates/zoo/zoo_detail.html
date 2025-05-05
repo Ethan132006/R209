@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>{{ zoo.nom }} - {{ zoo.ville }}</h2>
+<p>Directeur : {{ zoo.directeur_du_zoo }}</p>
+<p>Superficie : {{ zoo.superficie }} ha</p>
+<p>Date de création : {{ zoo.date_de_creation }}</p>
+
+<a href="{% url 'zoo_update' zoo.pk %}">Modifier</a> |
+<a href="{% url 'zoo_delete' zoo.pk %}">Supprimer</a>
+
+<h3>Animaux</h3>
+<a href="{% url 'animal_create' zoo.pk %}">➕ Ajouter un Animal</a>
+<ul>
+    {% for animal in zoo.animaux.all %}
+    <li>{{ animal.nom }} ({{ animal.espece }}) -
+        <a href="{% url 'animal_update' animal.pk %}">✏️</a>
+        <a href="{% url 'animal_delete' animal.pk %}">🗑️</a>
+    </li>
+    {% empty %}
+    <li>Aucun animal</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+
+

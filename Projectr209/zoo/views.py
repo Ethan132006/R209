@@ -1,62 +1,100 @@
 from django.shortcuts import render
 
 # Create your views here.
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
-from django.urls import reverse_lazy
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Zoo, Animal
 from .forms import ZooForm, AnimalForm
 
-# ZOO CRUD
-class ZooListView(ListView):
-    model = Zoo
-    template_name = 'zoo/zoo_list.html'
+def zoo_list(request):
+    zoos = Zoo.objects.all()
+    return render(request, 'zoo/zoo_list.html', {'zoos': zoos})
 
-class ZooDetailView(DetailView):
-    model = Zoo
-    template_name = 'zoo/zoo_detail.html'
+def zoo_detail(request, pk):
+    zoo = get_object_or_404(Zoo, pk=pk)
+    return render(request, 'zoo/zoo_detail.html', {'zoo': zoo})
 
-class ZooCreateView(CreateView):
-    model = Zoo
-    form_class = ZooForm
-    template_name = 'zoo/zoo_form.html'
-    success_url = reverse_lazy('zoo_list')
+def zoo_create(request):
+    form = ZooForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('zoo_list')
+    return render(request, 'zoo/zoo_form.html', {'form': form})
 
-class ZooUpdateView(UpdateView):
-    model = Zoo
-    form_class = ZooForm
-    template_name = 'zoo/zoo_form.html'
-    success_url = reverse_lazy('zoo_list')
+def zoo_update(request, pk):
+    zoo = get_object_or_404(Zoo, pk=pk)
+    form = ZooForm(request.POST or None, instance=zoo)
+    if form.is_valid():
+        form.save()
+        return redirect('zoo_detail', pk=pk)
+    return render(request, 'zoo/zoo_form.html', {'form': form})
 
-class ZooDeleteView(DeleteView):
-    model = Zoo
-    template_name = 'zoo/zoo_confirm_delete.html'
-    success_url = reverse_lazy('zoo_list')
+def zoo_delete(request, pk):
+    zoo = get_object_or_404(Zoo, pk=pk)
+    if request.method == 'POST':
+        zoo.delete()
+        return redirect('zoo_list')
+    return render(request, 'zoo/zoo_confirm_delete.html', {'zoo': zoo})
+
+def animal_create(request, zoo_id):
+    zoo = get_object_or_404(Zoo, pk=zoo_id)
+    form = AnimalForm(request.POST or None, initial={'zoo': zoo})
+    if form.is_valid():
+        form.save()
+        return redirect('zoo_detail', pk=zoo_id)
+    return render(request, 'zoo/animal_form.html', {'form': form, 'zoo': zoo})
+
+def animal_update(request, pk):
+    animal = get_object_or_404(Animal, pk=pk)
+    form = AnimalForm(request.POST or None, instance=animal)
+    if form.is_valid():
+        form.save()
+        return redirect('zoo_detail', pk=animal.zoo.pk)
+    return render(request, 'zoo/animal_form.html', {'form': form})
+
+def animal_delete(request, pk):
+    animal = get_object_or_404(Animal, pk=pk)
+    if request.method == 'POST':
+        zoo_id = animal.zoo.pk
+        animal.delete()
+        return redirect('zoo_detail', pk=zoo_id)
+    return render(request, 'zoo/animal_confirm_delete.html', {'animal': animal})
 
 
-# ANIMAL CRUD
-class AnimalListView(ListView):
-    model = Animal
-    template_name = 'zoo/animal_list.html'
 
-class AnimalDetailView(DetailView):
-    model = Animal
-    template_name = 'zoo/animal_detail.html'
 
-class AnimalCreateView(CreateView):
-    model = Animal
-    form_class = AnimalForm
-    template_name = 'zoo/animal_form.html'
-    success_url = reverse_lazy('animal_list')
 
-class AnimalUpdateView(UpdateView):
-    model = Animal
-    form_class = AnimalForm
-    template_name = 'zoo/animal_form.html'
-    success_url = reverse_lazy('animal_list')
 
-class AnimalDeleteView(DeleteView):
-    model = Animal
-    template_name = 'zoo/animal_confirm_delete.html'
-    success_url = reverse_lazy('animal_list')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
